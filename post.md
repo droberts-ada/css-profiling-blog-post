@@ -1,4 +1,6 @@
-# Debugging CSS Performance
+# Debugging CSS Performance with Chrome's Profiling Tools
+
+This is the story of how I found and fixed a performance problem in a React webapp. I've debugged many slow programs but never in the context of the web, so this was a great opportunity to experiment with the tools and grow my skill set. My problem turned out to be particularly tricky to analyze, but with the help of Chrome's performance tools, some manual profiling and a careful scientific approach I was able to find a solution.
 
 ## This Blog Post is Not About React
 
@@ -45,7 +47,7 @@ I could have used [`console.time()`](https://developer.mozilla.org/en-US/docs/We
 
 I also needed a consistent experiment to run, so that my trials would be as controlled as possible. Otherwise it could be random chance that made performance better or worse, rather than some "improvement" I had made. This means I needed a repeatable starting state, and a repeatable set of inputs to test.
 
-To get a starting state, I played the game to about midway through, then used the Chrome console and `JSON.stringify()` to get a representation of the game's state. Copy-paste it into a call to `JSON.parse()` in the constructor for the top-level component and I was good to go.
+To get a starting state, I played the game to about midway through, then used the Chrome console and `JSON.stringify()` to get a representation of the game's state. I copied and pasted that into a call to `JSON.parse()` in the constructor for the top-level component and I was good to go.
 
 For the experiment, I needed to be able to provide a "random" but repeatable set of mouse movements, a random walk across the game board. Unfortunately vanilla JavaScript doesn't allow you to seed the random number generator, but there exists a library called [seedrandom](https://github.com/davidbau/seedrandom) that allows you to do exactly that. Here's the random walk function I came up with:
 
@@ -117,7 +119,7 @@ But the numbers... nothing has changed. Not a single millisecond more or less. T
 
 ## Simplification
 
-Armed with some evidence and a theory, the consummate scientist has no choice but to attempt to prove themselves wrong. To falsify their hypothesis. So I set out to construct a perfect scenario to test whether gradients are really that bad for performance. No React, no complicated board state, just a big grid full of colored squares and a little bit of profiling.
+Armed with some evidence and a theory, the consummate scientist has no choice but to attempt to prove themselves wrong, to falsify their hypothesis. So I set out to construct a perfect scenario to test whether gradients are really that bad for performance. No React, no complicated board state, just a big grid full of colored squares and a little bit of profiling.
 
 This is what I came up with: the [CSS Gradient Test](https://droberts-ada.github.io/css-gradient-test/) ([source code](https://github.com/droberts-ada/css-gradient-test)). Load it and be amazed: on my 2015 MacBook the gradient version takes whole seconds to re-render, while the solid version (using the exact same code) is practically instant.
 
@@ -139,11 +141,15 @@ It's worth noting that the difference between CPU and GPU work is very obvious i
 
 ## Takeaways
 
-- Using Chrome's performance profiler provides a way better developer experience than messing around with valgrind
+- Using Chrome's performance profiler provides a way better developer experience than any tool I've worked with in a systems environment
     - There's still a bit of a learning curve
     - Even the most excellent tooling has blind spots
 - The same performance tuning principles apply equally well to systems programming and webdev:
     - Measuring is key, both relatively (what piece of this is slow) and absolutely (did this change make a difference)
     - To make sure you can trust your results, have a consistent experiment to run and control for as much as possible
 - I wrote this blog post after solving the problem, which might make it look like it was easy. In reality there were many hours of research, confusion, head-scratching and hard work to come to these conclusions. Also, I'm sure that my techniques could be improved!
-- Huge thanks to Charles for letting me bounce endless ideas off him
+- Huge thanks to my fellow instructor Charles for letting me bounce endless ideas off him
+
+**About the Author**
+
+Dan Roberts is the lead instructor at Ada Developers Academy
